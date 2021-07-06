@@ -8,9 +8,17 @@ import {
     ChangeCurrentCurrencyAC,
     CurrencyReducersTypes
 } from '../../redux/actions';
-import { connect, ConnectedProps } from 'react-redux';
+import {connect, ConnectedProps, useDispatch, useSelector} from 'react-redux';
+import {
+    selectAllStateValues,
+    selectAmountOfBYN,
+    selectAmountOfCurrency,
+    selectCurrencies,
+    selectCurrentCurrency,
+    selectIsBuying
+} from "../../redux/selectors";
 
-const CurrencyEContainer: React.FC<TProps> = props => {
+//const CurrencyEContainer: React.FC<TProps> = props => {
 //деструктуризация пропсов: мы не деструктурируем пропсы в самой функции, а просто получаем все пропсы и уже в рамках компоненты первой строкой делаем деструк-ю пропсов, для лучшей читаемости
     /*const {
         currencies,
@@ -22,7 +30,8 @@ const CurrencyEContainer: React.FC<TProps> = props => {
         setAction,
         changeCurrency,
     } = props;*/
-    const {
+
+    /*const {
         currencies,
         currentCurrency,
         isBuying,
@@ -31,7 +40,32 @@ const CurrencyEContainer: React.FC<TProps> = props => {
         ChangeCurrencyFieldAC,
         ChangeActionAC,
         ChangeCurrentCurrencyAC
-    } = props;
+    } = props;*/
+
+ /*   const {
+        currencies,
+        currentCurrency,
+        isBuying,
+        amountOfBYN,
+        amountOfCurrency,
+    } = props;*/
+
+    const CurrencyEContainer: React.FC = ()=> {
+    const dispatch =  useDispatch<Dispatch<CurrencyReducersTypes>>();
+
+    /*const currencies = useSelector(selectCurrencies);
+    const currentCurrency = useSelector(selectCurrentCurrency);
+    const isBuying = useSelector(selectIsBuying);
+    const amountOfBYN = useSelector(selectAmountOfBYN);
+    const amountOfCurrency = useSelector(selectAmountOfCurrency);
+    */
+
+    const {
+        currencies,
+        currentCurrency,
+        isBuying,
+        amountOfBYN,
+        amountOfCurrency} = useSelector(selectAllStateValues);
 
     let currencyRate: number = 0;
     //создаем массив имен валют: пробегаемся по массиву с валютами, проверяем на соответствие выбранной валюте и далее в зависимости что у нас покупка или продажа, выбирается курс и возвращаем имя валиты. Раз у нас это массив хранит только имя валюты, значит в будущем от отвечает за отрисовку кнопки с именем валюты
@@ -54,19 +88,23 @@ const CurrencyEContainer: React.FC<TProps> = props => {
             if (trigger === 'byn') {
                 if (value === '') {
                     //setCurrencyAmount(value, value);
-                    ChangeCurrencyFieldAC(value, value);
+                    //ChangeCurrencyFieldAC(value, value);
+                    dispatch(ChangeCurrencyFieldAC(value, value));
                 } else {
                     // приоритет у Number выше чем у унарного плюса, у + самый низкий приоритет, поэтому он выполнится, после выполнения всей строки Number(value).toFixed(2), toFixed возвращает строку, округляет до заданого количества знаков после запятой
                     //setCurrencyAmount(value, (+Number(value).toFixed(2) / currencyRate).toFixed(2));
-                    ChangeCurrencyFieldAC(value, (+Number(value).toFixed(2) / currencyRate).toFixed(2));
+                    //ChangeCurrencyFieldAC(value, (+Number(value).toFixed(2) / currencyRate).toFixed(2));
+                    dispatch(ChangeCurrencyFieldAC(value, (+Number(value).toFixed(2) / currencyRate).toFixed(2)));
                 }
             } else {
                 if (value === '') {
                     //setCurrencyAmount(value, value);
-                    ChangeCurrencyFieldAC(value, value);
+                    //ChangeCurrencyFieldAC(value, value);
+                    dispatch(ChangeCurrencyFieldAC(value, value));
                 } else {
                     //setCurrencyAmount((+Number(value).toFixed(2) * currencyRate).toFixed(2), value);
-                    ChangeCurrencyFieldAC((+Number(value).toFixed(2) * currencyRate).toFixed(2), value);
+                    //ChangeCurrencyFieldAC((+Number(value).toFixed(2) * currencyRate).toFixed(2), value);
+                    dispatch(ChangeCurrencyFieldAC((+Number(value).toFixed(2) * currencyRate).toFixed(2), value));
                 }
             }
         }
@@ -75,12 +113,14 @@ const CurrencyEContainer: React.FC<TProps> = props => {
     //это у нас кнопка Buy Sell и будет отвечать за то что будет храниться в redux в переменной isBuying
     const changeAction = (e: React.MouseEvent<HTMLSpanElement>) => {
         //e.currentTarget.dataset.action === 'buy' ? setAction(true) : setAction(false);
-        e.currentTarget.dataset.action === 'buy' ? ChangeActionAC(true) : ChangeActionAC(false);
+        //e.currentTarget.dataset.action === 'buy' ? ChangeActionAC(true) : ChangeActionAC(false);
+        e.currentTarget.dataset.action === 'buy' ? dispatch(ChangeActionAC(true)) : dispatch(ChangeActionAC(false));
     };
 // это нажатие на одну из кнопок, чтобы изменить текущую валюту; это один из вариантов выполнения выражения в JS через логические операторы
     const changeCurrentCurrency = (e: React.MouseEvent<HTMLLIElement>) => {
         //e.currentTarget.dataset.currency && changeCurrency(e.currentTarget.dataset.currency);
-        e.currentTarget.dataset.currency && ChangeCurrentCurrencyAC(e.currentTarget.dataset.currency);
+        //e.currentTarget.dataset.currency && ChangeCurrentCurrencyAC(e.currentTarget.dataset.currency);
+        e.currentTarget.dataset.currency && dispatch(ChangeCurrentCurrencyAC(e.currentTarget.dataset.currency));
         //если  e.currentTarget.dataset.currency false, то возвращает false, ничего не отрисуется, если true, то начинает выполнять второе выражение, собственно нам и надщ чтобы запустилась эта функция, сам результат логического И нас не интересует, но мы точно знаем что эта функция changeCurrency(e.currentTarget.dataset.currency) выполнится, только в том случае, если в первом выражении не null либо не undefined;  т.е таким способом мы делаем проверку на наличие значения, что необходимо для TypeScript
     };
 
@@ -103,7 +143,8 @@ const CurrencyEContainer: React.FC<TProps> = props => {
     );
 };
 
-const mapStateToProps = ( { currency } : {currency: CurrencyState} ): CurrencyState => {
+/*
+const mapStateToProps = ( { currency } : {currency: CurrencyState} ): CurrencyState => { //типизация и деструктуризация в typescript, в виде двух объектов: в первом говорим какой ключ достаем, а во втором говорим какого типа этот ключ
     return {
         currencies: currency.currencies,
         currentCurrency: currency.currentCurrency,
@@ -112,6 +153,7 @@ const mapStateToProps = ( { currency } : {currency: CurrencyState} ): CurrencySt
         amountOfCurrency: currency.amountOfCurrency,
     };
 };
+*/
 
 
 /*const mapDispatchToProps = (dispatch: Dispatch<CurrencyReducersTypes>) : any => {
@@ -134,11 +176,14 @@ const mapStateToProps = ( { currency } : {currency: CurrencyState} ): CurrencySt
 //Такую запись можно делить на кусочки:
 
 //const connector = connect(mapStateToProps, mapDispatchToProps);
-const connector = connect(mapStateToProps, { ChangeCurrencyFieldAC, ChangeActionAC, ChangeCurrentCurrencyAC });
+//const connector = connect(mapStateToProps, { ChangeCurrencyFieldAC, ChangeActionAC, ChangeCurrentCurrencyAC });
+//const connector = connect(mapStateToProps, { });
 
 //забираем тип из этой функции, для этого используем ConnectedProps из библиотеки react-redux, она доставет все тыпы которые в ней есть
 //т.е типизирует полностью mstp, mdtp
-type TProps = ConnectedProps<typeof connector>;
+//type TProps = ConnectedProps<typeof connector>;
 //далее уже вызываем функцию CurrencyEContainer и также используем созданную типизацию для нее.
-export default connector(CurrencyEContainer);
+// export default connector(CurrencyEContainer);
+
+export default CurrencyEContainer;
 
