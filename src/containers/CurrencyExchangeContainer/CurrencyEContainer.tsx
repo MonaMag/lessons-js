@@ -12,7 +12,7 @@ import { connect, ConnectedProps } from 'react-redux';
 
 const CurrencyEContainer: React.FC<TProps> = props => {
 //деструктуризация пропсов: мы не деструктурируем пропсы в самой функции, а просто получаем все пропсы и уже в рамках компоненты первой строкой делаем деструк-ю пропсов, для лучшей читаемости
-    const {
+    /*const {
         currencies,
         currentCurrency,
         isBuying,
@@ -21,6 +21,16 @@ const CurrencyEContainer: React.FC<TProps> = props => {
         setCurrencyAmount,
         setAction,
         changeCurrency,
+    } = props;*/
+    const {
+        currencies,
+        currentCurrency,
+        isBuying,
+        amountOfBYN,
+        amountOfCurrency,
+        ChangeCurrencyFieldAC,
+        ChangeActionAC,
+        ChangeCurrentCurrencyAC
     } = props;
 
     let currencyRate: number = 0;
@@ -43,16 +53,20 @@ const CurrencyEContainer: React.FC<TProps> = props => {
             const trigger: string = e.currentTarget.dataset.currency;
             if (trigger === 'byn') {
                 if (value === '') {
-                    setCurrencyAmount(value, value);
+                    //setCurrencyAmount(value, value);
+                    ChangeCurrencyFieldAC(value, value);
                 } else {
                     // приоритет у Number выше чем у унарного плюса, у + самый низкий приоритет, поэтому он выполнится, после выполнения всей строки Number(value).toFixed(2), toFixed возвращает строку, округляет до заданого количества знаков после запятой
-                    setCurrencyAmount(value, (+Number(value).toFixed(2) / currencyRate).toFixed(2));
+                    //setCurrencyAmount(value, (+Number(value).toFixed(2) / currencyRate).toFixed(2));
+                    ChangeCurrencyFieldAC(value, (+Number(value).toFixed(2) / currencyRate).toFixed(2));
                 }
             } else {
                 if (value === '') {
-                    setCurrencyAmount(value, value);
+                    //setCurrencyAmount(value, value);
+                    ChangeCurrencyFieldAC(value, value);
                 } else {
-                    setCurrencyAmount((+Number(value).toFixed(2) * currencyRate).toFixed(2), value);
+                    //setCurrencyAmount((+Number(value).toFixed(2) * currencyRate).toFixed(2), value);
+                    ChangeCurrencyFieldAC((+Number(value).toFixed(2) * currencyRate).toFixed(2), value);
                 }
             }
         }
@@ -60,11 +74,13 @@ const CurrencyEContainer: React.FC<TProps> = props => {
 
     //это у нас кнопка Buy Sell и будет отвечать за то что будет храниться в redux в переменной isBuying
     const changeAction = (e: React.MouseEvent<HTMLSpanElement>) => {
-        e.currentTarget.dataset.action === 'buy' ? setAction(true) : setAction(false);
+        //e.currentTarget.dataset.action === 'buy' ? setAction(true) : setAction(false);
+        e.currentTarget.dataset.action === 'buy' ? ChangeActionAC(true) : ChangeActionAC(false);
     };
 // это нажатие на одну из кнопок, чтобы изменить текущую валюту; это один из вариантов выполнения выражения в JS через логические операторы
     const changeCurrentCurrency = (e: React.MouseEvent<HTMLLIElement>) => {
-        e.currentTarget.dataset.currency && changeCurrency(e.currentTarget.dataset.currency);
+        //e.currentTarget.dataset.currency && changeCurrency(e.currentTarget.dataset.currency);
+        e.currentTarget.dataset.currency && ChangeCurrentCurrencyAC(e.currentTarget.dataset.currency);
         //если  e.currentTarget.dataset.currency false, то возвращает false, ничего не отрисуется, если true, то начинает выполнять второе выражение, собственно нам и надщ чтобы запустилась эта функция, сам результат логического И нас не интересует, но мы точно знаем что эта функция changeCurrency(e.currentTarget.dataset.currency) выполнится, только в том случае, если в первом выражении не null либо не undefined;  т.е таким способом мы делаем проверку на наличие значения, что необходимо для TypeScript
     };
 
@@ -97,8 +113,8 @@ const mapStateToProps = ( { currency } : {currency: CurrencyState} ): CurrencySt
     };
 };
 
-// @ts-ignore
-const mapDispatchToProps = (dispatch: Dispatch<CurrencyReducersTypes>) : any => {
+
+/*const mapDispatchToProps = (dispatch: Dispatch<CurrencyReducersTypes>) : any => {
     return {
         setCurrencyAmount(amountOfBYN: string, amountOfCurrency: string) {
             dispatch(ChangeCurrencyFieldAC(amountOfBYN, amountOfCurrency));
@@ -110,14 +126,15 @@ const mapDispatchToProps = (dispatch: Dispatch<CurrencyReducersTypes>) : any => 
             dispatch( ChangeCurrentCurrencyAC(currency));
         },
     };
-};
+};*/
 
-// @ts-ignore
+
 
 //const connector = connect(mapStateToProps, mapDispatchToProps)(CurrencyEContainer);
 //Такую запись можно делить на кусочки:
 
-const connector = connect(mapStateToProps, mapDispatchToProps);
+//const connector = connect(mapStateToProps, mapDispatchToProps);
+const connector = connect(mapStateToProps, { ChangeCurrencyFieldAC, ChangeActionAC, ChangeCurrentCurrencyAC });
 
 //забираем тип из этой функции, для этого используем ConnectedProps из библиотеки react-redux, она доставет все тыпы которые в ней есть
 //т.е типизирует полностью mstp, mdtp
