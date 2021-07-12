@@ -1,4 +1,4 @@
-import {ACTIONS_TYPE} from './actions';
+import  {ACTIONS_TYPE} from './actions';
 import {CurrencyReducersTypes} from "./actions";
 
 
