@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import API from './API';
 import './lesson_3';
 
+
 const Lesson3 = () => {
     const [searchName, setSearchName] = useState('');
     const [searchResult, setSearchResult] = useState('');
@@ -43,9 +44,20 @@ const Lesson3 = () => {
         }
     }
 
-    const searchByType = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const searchByType = async (e: React.MouseEvent<HTMLButtonElement>) => {
+        try {
         const type: string = e.currentTarget.dataset.t ? e.currentTarget.dataset.t : '';
-        API.searchFilmsByType(searchNameByType, type)
+        const result = await API.searchFilmsByType(searchNameByType, type);
+        console.log(result);
+        result.data.Response === 'True'
+        ? setSearchResultByType(JSON.stringify(result.data.Search))
+            : setSearchResultByType(result.data.Error)
+        } catch (e) {
+            e
+        }
+
+        /*API.searchFilmsByType(searchNameByType, type)
+            .then(res => console.log(res));*/
     }
 
     return (
